@@ -1,0 +1,17 @@
+numpy
+pandas
+scikit-learn
+scipy
+pyyaml
+opencv-python-headless
+matplotlib
+torch
+torchvision
+transformers        # only needed for the real TimeSformer backbone
+fastapi
+uvicorn[standard]
+httpx               # FastAPI TestClient
+pytest
+    # Added in later phases:
+    # ultralytics       # YOLOv8 pose (Phase 2)
+    # grad-cam          # GradCAM (Phase 3)

@@ -1,0 +1,45 @@
+# Default experiment config. Copy this file to make a new experiment, e.g. configs/mock_phase1.yaml.
+# Any value can be overridden from the command line:  --set train.epochs=2 --set model.backbone=tiny
+seed: 42
+
+data:
+  manifest: data/synthetic/manifest.csv   # THE switch between synthetic / mock / ntu / hospital data
+  sources: null                           # e.g. [mock, ntu]  -> only use rows from these sources
+  num_frames: 8                           # T. TimeSformer-base-k400 expects 8 (keep configurable)
+  image_size: 64                          # 224 for the real TimeSformer, 64 for fast CPU tests
+  # --- only used by the synthetic generator ---
+  synthetic_root: data/synthetic
+  synthetic_n_clips: 300
+  synthetic_class_probs: [0.15, 0.30, 0.55]   # RED, YELLOW, GREEN
+
+model:
+  backbone: tiny                          # tiny (CPU test) | timesformer (real)
+  pretrained: facebook/timesformer-base-finetuned-k400
+  pose_hidden: 64
+  dropout: 0.2
+  train_mode: full                        # frozen | last4 | full   (3-phase strategy, see README)
+
+loss:
+  alpha: 1.0            # focal loss weight
+  beta: 0.3             # auxiliary pose-head loss weight
+  gamma: 0.2            # consistency loss weight
+  focal_gamma: 2.0
+  class_weights: [5.0, 1.5, 1.0]   # RED, YELLOW, GREEN
+
+train:
+  epochs: 5
+  batch_size: 16
+  lr: 0.001
+  weight_decay: 0.0001
+  oversample_red: 2.0       # RED sampling multiplier (1.0 = off). Proposal says 5x for Phase 3.
+  num_workers: 0
+  device: auto              # auto | cpu | cuda
+  amp: true                 # mixed precision, only used on cuda
+  init_checkpoint: null     # path to a previous phase's checkpoint to continue from
+  out_dir: runs/synthetic
+
+serving:
+  tau: 0.5                  # alert threshold on p_RED. Re-tune on real validation data!
+  rescoring_minutes: 5
+  audit_log: runs/audit_log.jsonl
+  checkpoint: null          # null -> stub model with random probabilities
