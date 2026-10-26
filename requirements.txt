@@ -12,6 +12,7 @@ fastapi
 uvicorn[standard]
 httpx               # FastAPI TestClient
 pytest
+ultralytics
     # Added in later phases:
     # ultralytics       # YOLOv8 pose (Phase 2)
     # grad-cam          # GradCAM (Phase 3)
